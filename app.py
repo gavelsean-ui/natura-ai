@@ -112,19 +112,38 @@ if results:
                 item["ai_analysis"] = ai_res
             progress_bar.progress((i + 1) / len(results))
             
-               status_text.text("✅ Rapport PDF prêt !")
-        
-        # On nettoie le nom du fichier pour éviter les bugs sur mobile
-        query_safe = "".join(c for c in st.session_state.get('last_query', 'recherche') if c.isalnum() or c in (' ', '_')).replace(' ', '_')
-        
-        st.download_button(
-            label="⬇️ Télécharger le dossier PDF",
-            data=pdf_bytes,
-            file_name=f"natura_dossier_{query_safe}.pdf",
-            mime="application/pdf",
-            use_container_width=True  # Rend le bouton plus grand sur mobile
-        )
-        
+                         if st.button("📄 Générer le rapport PDF professionnel"):
+                if not api_key:
+                    st.warning("⚠️ Sans clé API, le rapport contiendra uniquement les résumés bruts.")
+                    
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                # On fait l'analyse IA pour tous les articles avant de générer le PDF
+                for i, item in enumerate(results):
+                    status_text.text(f"Analyse de l'article {i+1}/{len(results)} avec l'IA...")
+                    if api_key and item.get("abstract"):
+                        ai_res = analyze_abstract_with_ai(api_key, item.get("abstract", ""))
+                        item["ai_analysis"] = ai_res
+                    progress_bar.progress((i + 1) / len(results))
+                    
+                status_text.text("Génération du document PDF...")
+                
+                # Génération du PDF
+                pdf_bytes = generate_pdf(st.session_state.get('last_query', ''), results)
+                
+                status_text.text("✅ Rapport PDF prêt !")
+                
+                # On nettoie le nom du fichier pour éviter les bugs sur mobile
+                query_safe = "".join(c for c in st.session_state.get('last_query', 'recherche') if c.isalnum() or c in (' ', '_')).replace(' ', '_')
+                
+                st.download_button(
+                    label="⬇️ Télécharger le dossier PDF",
+                    data=pdf_bytes,
+                    file_name=f"natura_dossier_{query_safe}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True  # Rend le bouton plus grand sur mobile
+                )
     # ------------------------------------------------
 
     for idx, item in enumerate(results):
