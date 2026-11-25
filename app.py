@@ -13,10 +13,13 @@ st.title("🌿 NATURA AI")
 st.subheader("Prototype 0.9 — Rapports PDF")
 st.write("Recherche multi-sources, enrichissement et génération de rapports PDF professionnels.")
 
-with st.sidebar:
-    st.header("🔑 Configuration IA")
-    api_key = st.text_input("Clé API Agnes AI", type="password", help="Obtenez une clé sur agnes-ai.com")
-    st.caption("L'IA analysera les résumés pour enrichir le rapport final.")
+# --- BARRE LATÉRALE POUR LA CLÉ API ---
+api_key = st.secrets.get("AGNES_API_KEY", "")
+if not api_key:
+    with st.sidebar:
+        st.header("🔑 Configuration IA")
+        api_key = st.text_input("Clé API Agnes AI", type="password", help="Obtenez une clé sur agnes-ai.com")
+        st.caption("L'IA analysera les résumés pour enrichir le rapport final.")
 
 st.info(
     "Le NATURA SCORE évalue la solidité méthodologique et l'impact d'un article basé sur ses métadonnées. "
