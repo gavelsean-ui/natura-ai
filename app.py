@@ -112,18 +112,19 @@ if results:
                 item["ai_analysis"] = ai_res
             progress_bar.progress((i + 1) / len(results))
             
-        status_text.text("Génération du document PDF...")
+               status_text.text("✅ Rapport PDF prêt !")
         
-        # Génération du PDF
-        pdf_bytes = generate_pdf(st.session_state.get('last_query', ''), results)
+        # On nettoie le nom du fichier pour éviter les bugs sur mobile
+        query_safe = "".join(c for c in st.session_state.get('last_query', 'recherche') if c.isalnum() or c in (' ', '_')).replace(' ', '_')
         
-        status_text.text("✅ Rapport PDF prêt !")
         st.download_button(
             label="⬇️ Télécharger le dossier PDF",
             data=pdf_bytes,
-            file_name=f"natura_dossier_{st.session_state.get('last_query', 'recherche').replace(' ', '_')}.pdf",
-            mime="application/pdf"
+            file_name=f"natura_dossier_{query_safe}.pdf",
+            mime="application/pdf",
+            use_container_width=True  # Rend le bouton plus grand sur mobile
         )
+        
     # ------------------------------------------------
 
     for idx, item in enumerate(results):
